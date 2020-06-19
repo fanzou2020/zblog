@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fan.zblog.mapper.CommentMapper">
+  <resultMap id="BaseResultMap" type="com.fan.zblog.model.Comment">
+    <id column="commentId" jdbcType="BIGINT" property="commentId" />
+    <result column="blogId" jdbcType="BIGINT" property="blogId" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="createTime" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    commentId, blogId, username, content, createTime
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from Comment
+    where commentId = #{commentId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from Comment
+    where commentId = #{commentId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" keyColumn="commentId" keyProperty="commentId" parameterType="com.fan.zblog.model.Comment" useGeneratedKeys="true">
+    insert into Comment (blogId, username, content, 
+      createTime)
+    values (#{blogId,jdbcType=BIGINT}, #{username,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" keyColumn="commentId" keyProperty="commentId" parameterType="com.fan.zblog.model.Comment" useGeneratedKeys="true">
+    insert into Comment
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="blogId != null">
+        blogId,
+      </if>
+      <if test="username != null">
+        username,
+      </if>
+      <if test="content != null">
+        content,
+      </if>
+      <if test="createTime != null">
+        createTime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="blogId != null">
+        #{blogId,jdbcType=BIGINT},
+      </if>
+      <if test="username != null">
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.fan.zblog.model.Comment">
+    update Comment
+    <set>
+      <if test="blogId != null">
+        blogId = #{blogId,jdbcType=BIGINT},
+      </if>
+      <if test="username != null">
+        username = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        createTime = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where commentId = #{commentId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.fan.zblog.model.Comment">
+    update Comment
+    set blogId = #{blogId,jdbcType=BIGINT},
+      username = #{username,jdbcType=VARCHAR},
+      content = #{content,jdbcType=VARCHAR},
+      createTime = #{createTime,jdbcType=TIMESTAMP}
+    where commentId = #{commentId,jdbcType=BIGINT}
+  </update>
+</mapper>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fan.zblog.mapper.TagMapper">
+  <resultMap id="BaseResultMap" type="com.fan.zblog.model.Tag">
+    <id column="tag" jdbcType="VARCHAR" property="tag" />
+    <id column="username" jdbcType="VARCHAR" property="username" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="com.fan.zblog.model.Tag">
+    delete from Tag
+    where tag = #{tag,jdbcType=VARCHAR}
+      and username = #{username,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.fan.zblog.model.Tag">
+    insert into Tag (tag, username)
+    values (#{tag,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR})
+  </insert>
+</mapper>
