@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fan.zblog.mapper.BlogTagMapper">
+  <resultMap id="BaseResultMap" type="com.fan.zblog.model.BlogTagKey">
+    <id column="blogId" jdbcType="BIGINT" property="blogId" />
+    <id column="username" jdbcType="VARCHAR" property="username" />
+    <id column="tag" jdbcType="VARCHAR" property="tag" />
+  </resultMap>
+
+
+  <select id="getTagsByBlogId" parameterType="java.lang.Long" resultMap="com.fan.zblog.mapper.TagMapper.BaseResultMap">
+    select tag, username
+    from Tag natural join Blog_Tag
+    where blogId=#{blogId}
+  </select>
+
+
+  <select id="getBlogsByTag" parameterType="com.fan.zblog.model.Tag" resultMap="com.fan.zblog.mapper.BlogMapper.BaseResultMap">
+    select Blog.*
+    from Blog natural join Blog_Tag
+    where tag=#{tag} and username=#{username}
+  </select>
+
+
+  <delete id="deleteByPrimaryKey" parameterType="com.fan.zblog.model.BlogTagKey">
+    delete from Blog_Tag
+    where blogId = #{blogId,jdbcType=BIGINT}
+      and username = #{username,jdbcType=VARCHAR}
+      and tag = #{tag,jdbcType=VARCHAR}
+  </delete>
+
+
+  <insert id="insert" parameterType="com.fan.zblog.model.BlogTagKey">
+    insert into Blog_Tag (blogId, username, tag
+      )
+    values (#{blogId,jdbcType=BIGINT}, #{username,jdbcType=VARCHAR}, #{tag,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.fan.zblog.model.BlogTagKey">
+    insert into Blog_Tag
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="blogId != null">
+        blogId,
+      </if>
+      <if test="username != null">
+        username,
+      </if>
+      <if test="tag != null">
+        tag,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="blogId != null">
+        #{blogId,jdbcType=BIGINT},
+      </if>
+      <if test="username != null">
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="tag != null">
+        #{tag,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+</mapper>
