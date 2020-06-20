@@ -1,30 +1,97 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.fan.zblog.mapper.BlogMapper">
-  <resultMap id="BaseResultMap" type="com.fan.zblog.model.Blog">
-    <id column="blogId" jdbcType="BIGINT" property="blogId" />
-    <result column="username" jdbcType="VARCHAR" property="username" />
-    <result column="title" jdbcType="VARCHAR" property="title" />
-    <result column="category" jdbcType="VARCHAR" property="category" />
-    <result column="summary" jdbcType="VARCHAR" property="summary" />
-    <result column="content" jdbcType="VARCHAR" property="content" />
-    <result column="createTime" jdbcType="TIMESTAMP" property="createTime" />
-    <result column="modifyTime" jdbcType="TIMESTAMP" property="modifyTime" />
-  </resultMap>
-  <sql id="Base_Column_List">
+    <resultMap id="BaseResultMap" type="com.fan.zblog.model.Blog">
+        <id column="blogId" jdbcType="BIGINT" property="blogId"/>
+        <result column="username" jdbcType="VARCHAR" property="username"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="category" jdbcType="VARCHAR" property="category"/>
+        <result column="summary" jdbcType="VARCHAR" property="summary"/>
+        <result column="content" jdbcType="VARCHAR" property="content"/>
+        <result column="createTime" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="modifyTime" jdbcType="TIMESTAMP" property="modifyTime"/>
+        <collection property="tags" column="blogId" select="getTagsByBlogId"/>
+    </resultMap>
+    <resultMap id="TagResultMap" type="com.fan.zblog.model.Tag">
+        <id column="tag" property="tag"/>
+        <id column="username" property="username"/>
+    </resultMap>
+
+<!--    find a blog's tags-->
+    <select id="getTagsByBlogId" resultMap="TagResultMap">
+        select Blog_Tag.tag, Blog_Tag.username
+        from Blog, Blog_Tag
+        where Blog.blogId = Blog_Tag.blogId and Blog.blogId = #{blogId}
+    </select>
+
+
+
+    <sql id="Base_Column_List">
     blogId, username, title, category, summary, content, createTime, modifyTime
-  </sql>
-  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select 
-    <include refid="Base_Column_List" />
-    from Blog
-    where blogId = #{blogId,jdbcType=BIGINT}
-  </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    </sql>
+
+
+<!--    select blog by primary key-->
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from Blog
+        where blogId = #{blogId,jdbcType=BIGINT}
+    </select>
+
+<!--    find all blogs-->
+    <select id="findAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from Blog
+    </select>
+
+<!--    find blogs by username-->
+    <select id="findBlogsByUsername" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from Blog
+        where username = #{username}
+    </select>
+
+
+
+<!--   find blogs by category -->
+    <select id="findBlogsByCategory" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from Blog
+        where category = #{category}
+    </select>
+
+
+<!--    find blogs by username and category -->
+    <select id="findBlogsByUsernameAndCategory" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from Blog
+        where category = #{category} and username = #{username}
+    </select>
+
+
+<!--    find blog by username and blogId-->
+    <select id="findBlogByUsernameAndBlogId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from Blog
+        where username = #{username} and blogId = #{blogId}
+    </select>
+
+
+<!--    delete blog by primary key, which is blogId-->
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from Blog
     where blogId = #{blogId,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" keyColumn="blogId" keyProperty="blogId" parameterType="com.fan.zblog.model.Blog" useGeneratedKeys="true">
+
+
+<!--    insert blog into database-->
+    <insert id="insert" keyColumn="blogId" keyProperty="blogId" parameterType="com.fan.zblog.model.Blog"
+            useGeneratedKeys="true">
     insert into Blog (username, title, category, 
       summary, content, createTime, 
       modifyTime)
@@ -32,83 +99,90 @@
       #{summary,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
       #{modifyTime,jdbcType=TIMESTAMP})
   </insert>
-  <insert id="insertSelective" keyColumn="blogId" keyProperty="blogId" parameterType="com.fan.zblog.model.Blog" useGeneratedKeys="true">
-    insert into Blog
-    <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="username != null">
-        username,
-      </if>
-      <if test="title != null">
-        title,
-      </if>
-      <if test="category != null">
-        category,
-      </if>
-      <if test="summary != null">
-        summary,
-      </if>
-      <if test="content != null">
-        content,
-      </if>
-      <if test="createTime != null">
-        createTime,
-      </if>
-      <if test="modifyTime != null">
-        modifyTime,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="username != null">
-        #{username,jdbcType=VARCHAR},
-      </if>
-      <if test="title != null">
-        #{title,jdbcType=VARCHAR},
-      </if>
-      <if test="category != null">
-        #{category,jdbcType=VARCHAR},
-      </if>
-      <if test="summary != null">
-        #{summary,jdbcType=VARCHAR},
-      </if>
-      <if test="content != null">
-        #{content,jdbcType=VARCHAR},
-      </if>
-      <if test="createTime != null">
-        #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="modifyTime != null">
-        #{modifyTime,jdbcType=TIMESTAMP},
-      </if>
-    </trim>
-  </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.fan.zblog.model.Blog">
-    update Blog
-    <set>
-      <if test="username != null">
-        username = #{username,jdbcType=VARCHAR},
-      </if>
-      <if test="title != null">
-        title = #{title,jdbcType=VARCHAR},
-      </if>
-      <if test="category != null">
-        category = #{category,jdbcType=VARCHAR},
-      </if>
-      <if test="summary != null">
-        summary = #{summary,jdbcType=VARCHAR},
-      </if>
-      <if test="content != null">
-        content = #{content,jdbcType=VARCHAR},
-      </if>
-      <if test="createTime != null">
-        createTime = #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="modifyTime != null">
-        modifyTime = #{modifyTime,jdbcType=TIMESTAMP},
-      </if>
-    </set>
-    where blogId = #{blogId,jdbcType=BIGINT}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.fan.zblog.model.Blog">
+
+
+    <insert id="insertSelective" keyColumn="blogId" keyProperty="blogId" parameterType="com.fan.zblog.model.Blog"
+            useGeneratedKeys="true">
+        insert into Blog
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="username != null">
+                username,
+            </if>
+            <if test="title != null">
+                title,
+            </if>
+            <if test="category != null">
+                category,
+            </if>
+            <if test="summary != null">
+                summary,
+            </if>
+            <if test="content != null">
+                content,
+            </if>
+            <if test="createTime != null">
+                createTime,
+            </if>
+            <if test="modifyTime != null">
+                modifyTime,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="username != null">
+                #{username,jdbcType=VARCHAR},
+            </if>
+            <if test="title != null">
+                #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="category != null">
+                #{category,jdbcType=VARCHAR},
+            </if>
+            <if test="summary != null">
+                #{summary,jdbcType=VARCHAR},
+            </if>
+            <if test="content != null">
+                #{content,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyTime != null">
+                #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.fan.zblog.model.Blog">
+        update Blog
+        <set>
+            <if test="username != null">
+                username = #{username,jdbcType=VARCHAR},
+            </if>
+            <if test="title != null">
+                title = #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="category != null">
+                category = #{category,jdbcType=VARCHAR},
+            </if>
+            <if test="summary != null">
+                summary = #{summary,jdbcType=VARCHAR},
+            </if>
+            <if test="content != null">
+                content = #{content,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                createTime = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyTime != null">
+                modifyTime = #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where blogId = #{blogId,jdbcType=BIGINT}
+    </update>
+
+
+    <update id="updateByPrimaryKey" parameterType="com.fan.zblog.model.Blog">
     update Blog
     set username = #{username,jdbcType=VARCHAR},
       title = #{title,jdbcType=VARCHAR},

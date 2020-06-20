@@ -3,13 +3,49 @@
 <mapper namespace="com.fan.zblog.mapper.TagMapper">
   <resultMap id="BaseResultMap" type="com.fan.zblog.model.Tag">
     <id column="tag" jdbcType="VARCHAR" property="tag" />
-    <id column="username" jdbcType="VARCHAR" property="username" />
+    <id column="tagUsername" jdbcType="VARCHAR" property="username" />
+    <collection property="blogs" resultMap="BlogResultMap"/>
   </resultMap>
+  <resultMap id="BlogResultMap" type="com.fan.zblog.model.Blog">
+    <id column="blogId" jdbcType="BIGINT" property="blogId" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="category" jdbcType="VARCHAR" property="category" />
+    <result column="summary" jdbcType="VARCHAR" property="summary" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="createTime" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="modifyTime" jdbcType="TIMESTAMP" property="modifyTime" />
+  </resultMap>
+
+  <update id="updateTag">
+    update Tag
+    set tag = #{newTag.tag},
+        username = #{newTag.username}
+    where tag = #{oldTag.tag} and
+          username = #{oldTag.username}
+  </update>
+
+
+  <select id="selectTag" resultMap="BaseResultMap">
+    select Blog.*, Blog_Tag.tag as tag, Blog_Tag.username as tagUsername
+    from Blog, Blog_Tag
+    where Blog.blogId = Blog_Tag.blogId and Blog_Tag.tag = #{tag} and Blog_Tag.username = #{username}
+  </select>
+
+  <select id="findTagsByUsername" resultMap="BaseResultMap">
+    select Blog.*, Blog_Tag.tag as tag, Blog_Tag.username as tagUsername
+    from Blog, Blog_Tag
+    where Blog.blogId = Blog_Tag.blogId and Blog_Tag.username = #{username}
+  </select>
+
+
   <delete id="deleteByPrimaryKey" parameterType="com.fan.zblog.model.Tag">
     delete from Tag
     where tag = #{tag,jdbcType=VARCHAR}
       and username = #{username,jdbcType=VARCHAR}
   </delete>
+
+
   <insert id="insert" parameterType="com.fan.zblog.model.Tag">
     insert into Tag (tag, username)
     values (#{tag,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR})

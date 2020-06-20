@@ -15,7 +15,6 @@ import javax.validation.constraints.NotBlank;
 @Data
 @ToString
 @EqualsAndHashCode
-@RequiredArgsConstructor
 public class Blog implements Serializable {
     private Long blogId;
 
